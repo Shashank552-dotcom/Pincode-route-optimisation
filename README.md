@@ -3,7 +3,7 @@ Excel + Power Query + Mapbox API + ORS + OSM
 
 The Problem
 Logistics managers were manually looking up source-to-destination distances one pincode at a time on Google Maps — entering each pair individually, recording distance and time manually. For a single warehouse covering 200–1,000 delivery pincodes, this process took 2–3 days per location.
-With 17+ warehouse locations across India, this was unsustainable.
+With 20+ warehouse locations across India, this was unsustainable.
 
 The Solution
 An Excel-based route optimisation tool built entirely in Power Query using:
@@ -17,8 +17,14 @@ The tool processes 200–1,000+ destination pincodes per warehouse run in under 
 
 How It Works — Step by Step
 The tool uses 7 custom Power Query functions that must be invoked in sequence:
+
 Queries in this file:
-QueryTypePurposeMapbox Distance AKI...TableMain output table — source to destination distancesfnGetLatLong_OSMFunction (fx)Gets latitude & longitude for any pincode using OSMfnGetRoute_ORSFunction (fx)Gets route distance using OpenRouteServicefxMapboxGeoFunction (fx)Geocoding via Mapbox — pincode to coordinatesfxMapboxTimeFunction (fx)Gets travel time between two coordinates via MapboxfnGetCityFromPincod...Function (fx)Returns city/area name from pincode using Pincode MasterMapbox DISTANCETableCore distance calculation table
+
+Query                   Type            Purpose
+Mapbox Distance AKI     Table          Main output table — source to destination distances 
+fnGetLatLong_OSM        Function (fx)  Gets latitude & longitude for any pincode using OSM fnGetRoute_ORS          Function (fx)  Gets route distance using OpenRouteService
+fxMapboxGeo             Function (fx)  Geocoding via Mapbox — pincode to coordinates
+fxMapboxTime            Function (fx)  Gets travel time between two coordinates via Mapbox fnGetCityFromPincode    Function (fx)  Returns city/area name from pincode using Pincode Mapbox DISTANCE         Table          Core distance calculation table
 
 Usage Instructions
 Prerequisites
@@ -29,59 +35,52 @@ Microsoft Excel with Power Query (Excel 2016 or later)
 
 Step 1 — Add Your API Key
 
-Open Power Query Editor: Data → Get Data → Launch Power Query Editor
-Click on fxMapboxTime in the left panel
-Find the step containing YOUR_MAPBOX_API_KEY
-Replace with your actual Mapbox API key
-Repeat for fxMapboxGeo and Mapbox DISTANCE queries
+. Open Power Query Editor: Data → Get Data → Launch Power Query Editor
+. Click on fxMapboxTime in the left panel
+. Find the step containing YOUR_MAPBOX_API_KEY
+. Replace with your actual Mapbox API key
+. Repeat for fxMapboxGeo and Mapbox DISTANCE queries
 
 Step 2 — Prepare Your Source Table
 
-Select the sheet for your warehouse location
-Create a table with two columns:
-
-Source_Pincode — your warehouse pincode (single value)
-Destination_Pincode — list of all delivery pincodes
+. Select the sheet for your warehouse location
+. Create a table with two columns:
+        * Source_Pincode — your warehouse pincode (single value)
+        * Destination_Pincode — list of all delivery pincodes
 
 
 
 Step 3 — Get Coordinates (Lat/Long)
 
-In your table, add a Custom Column
-Invoke fnGetLatLong_OSM for the Source Pincode
-→ Returns Source Latitude and Source Longitude
-Add another Custom Column
-Invoke fnGetLatLong_OSM for the Destination Pincode
-→ Returns Destination Latitude and Destination Longitude
+. In your table, add a Custom Column
+. Invoke fnGetLatLong_OSM for the Source Pincode  → Returns Source Latitude and Source  Longitude
+. Add another Custom Column
+. Invoke fnGetLatLong_OSM for the Destination Pincode → Returns Destination Latitude and Destination Longitude
 
 Step 4 — Get Distance
 
-Add a Custom Column
-Invoke Mapbox DISTANCE passing:
+. Add a Custom Column
+. Invoke Mapbox DISTANCE passing:
 
 Source Latitude, Source Longitude
 Destination Latitude, Destination Longitude
 → Returns road distance in kilometres
 
-
-
 Step 5 — Get Travel Time
 
-Add a Custom Column
-Invoke fxMapboxTime passing the same coordinates
-→ Returns estimated travel time in minutes
+. Add a Custom Column
+. Invoke fxMapboxTime passing the same coordinates → Returns estimated travel time in minutes
 
 Step 6 — Get City/Area Name
 
-Add a Custom Column
-Invoke fnGetCityFromPincod... passing the Destination Pincode
-→ Returns area name and city from India Post master data
+. Add a Custom Column
+. Invoke fnGetCityFromPincod... passing the Destination Pincode → Returns area name and city from India Post master data
 
 Step 7 — Expand and Load
 
-Expand all custom columns to individual fields
-Click Close & Load
-Output table is ready with full route data
+. Expand all custom columns to individual fields
+. Click Close & Load
+. Output table is ready with full route data
 
 
 Output Columns
@@ -89,6 +88,7 @@ ColumnDescriptionSource PincodeWarehouse origin pincodeDestination PincodeDelive
 
 Coverage
 This file includes pre-built output sheets for 19 warehouse locations across India:
+
 Delhi NCR - ( WH_Delhi, WH_Delhi_West, WH_Gurugram, WH_Noida, WH_GBN) 
 West - ( WH_Pune, WH_Bhiwandi (Mumbai), WH_Indore) 
 South - (WH_Bangalore, WH_Hyderabad, WH_Chennai) 
